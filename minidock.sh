@@ -4,7 +4,7 @@
 
 SCRIPT_PATH=${0%/*}
 
-WINDOW_WIDTH=26    # font dependent
+POS_Y_MIDDLE=1     # 0 - top right corner, 1 - middle right side
 IGNORE_IP_LOC='kr' # ip_loc only drawn if not this value (no connection or VPN)
 
 # '' (turn off) or 'print_app_icons.sh' or 'print_app_names.sh'
@@ -14,9 +14,10 @@ PRINT_APP_SH='print_app_names.sh'
 cnt=`ps -A | grep 'poll_ip_loc\.sh' | wc -l`
 [ $cnt = 0 ] && $SCRIPT_PATH/poll_ip_loc.sh &
 
-# Storage for $rows, $pos_x inside loop
+# Storage for variables inside loop
 rows_prev=0
 pos_x_prev=0
+pos_y_prev=0
 
 while sleep .1; do
 
@@ -54,27 +55,42 @@ while sleep .1; do
     fi 
 
     # Resize
-    # prevent content shifting by pre-/post-scrolling
+    # Prevent content shifting by pre-/post-scrolling
     [ $rows -gt $rows_prev ] && printf "\033["$(($rows - $rows_prev))"S"
     [ $rows  != $rows_prev ] && printf "\033[8;"$rows";20t" # minimum is 2;20
     [ $rows -lt $rows_prev ] && printf "\033["$(($rows_prev - $rows))"T"
     rows_prev=$rows
 
 
-    # Calculate position based on screen size
-    # Dock can modify coordinates, so compensate for it
-    widths=(`$SCRIPT_PATH/screen_width`)
+    # Calculate position based on screen size & window size
+    # Window size with 14pt Menlo Regular
+    #   size_x = col *  8 + 26 (left edge to first character distance 5)
+    #   size_y = row * 17 +  6
+    sizes=(`$SCRIPT_PATH/screen_size`)
+
+    # Compensate for x-coordinate modification due to the Dock
     orientation=`defaults read com.apple.dock orientation`
     if [ $orientation = 'left' ]; then
-        main_width=${widths[1]} # use visibleFrame's width
+        main_width=${sizes[1]} # use visibleFrame's width
     else
-        main_width=${widths[0]} # use frame's width
+        main_width=${sizes[0]} # use frame's width
     fi
-    pos_x=$(($main_width - $WINDOW_WIDTH))
+    pos_x=$(($main_width - 26)) # substract window width (5 + 2 * 8 + 5)
+    
+    if [ $POS_Y_MIDDLE = 0 ]; then
+        pos_y=0
+    else
+        pos_y=$(((${sizes[2]} - ($rows * 17 + 6)) / 2)) # font size dependent
+
+        # Compensate for y-coordinate modification due to the Menu Bar
+        menu_hidden=`defaults read NSGlobalDomain _HIHideMenuBar`
+        [ $menu_hidden = 0 ] && pos_y=$(($pos_y - (${sizes[2]} - ${sizes[3]})))
+    fi
     
     # Reposition
-    [ $pos_x != $pos_x_prev ] && printf "\033[3;"$pos_x";0t"
+    [[ $pos_y != $pos_y_prev || $pos_x != $pos_x_prev ]] && printf "\033[3;"$pos_x";"$pos_y"t"
     pos_x_prev=$pos_x
+    pos_y_prev=$pos_y
 
 
     # Display

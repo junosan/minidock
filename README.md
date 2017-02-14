@@ -5,8 +5,8 @@
 &nbsp;&nbsp;&nbsp; <img src="readme/app_none.png" width="34"/>
 
 `minidock.sh` is a Bash script for [iTerm2](https://www.iterm2.com) that
-creates a miniature dock (26 px wide) with a list of currently open apps and some
-status information usually served on the Menu Bar.
+creates a miniature dock (26 px wide) with a list of currently open apps
+and some status information usually served on the Menu Bar.
 It is intended to provide just enough information to help make macOS less
 inconvenient with the Menu Bar & Dock hidden for screen estate/minimalism.
 
@@ -19,7 +19,8 @@ inconvenient with the Menu Bar & Dock hidden for screen estate/minimalism.
   - (optional) internet connection
                (nc - no connection, country - to tell if on VPN)
   - (optional) currently open apps (dot on focused app)
-- Placed at top right corner; automatically adjusts to screen size changes 
+- Placed at the middle right side or the top right corner;
+  automatically adjusts to screen size changes 
 
 
 # How to use
@@ -33,7 +34,7 @@ inconvenient with the Menu Bar & Dock hidden for screen estate/minimalism.
   - Profiles > Colors (Background/Cursor f7f7f7) (optional)
   - Profiles > Text > Font (14pt Menlo Regular, Anti-aliased) (optional)
   - Profiles > Window > Style > No Title Bar
-  - Profiles > Terminal > (turn off) Disable session-initialized window resizing
+  - Profiles > Terminal > (off) Disable session-initialized window resizing
   - Keys > Show/hide *iTerm2* with a system-wide hotkey
   - Advanced > Hide *iTerm2* from the dock (optional)
 - If *iTerm2* is not showing up, use the show/hide hotkey (`cmd-space`)

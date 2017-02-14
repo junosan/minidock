@@ -2,7 +2,7 @@
 icons/*.png
 audio_device
 print_app
-screen_width
+screen_size
 
 
 # Ignore macOS files
