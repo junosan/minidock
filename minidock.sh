@@ -5,14 +5,13 @@
 SCRIPT_PATH=${0%/*}
 
 POS_Y_MIDDLE=1     # 0 - top right corner, 1 - middle right side
-IGNORE_IP_LOC='kr' # ip_loc only drawn if not this value (no connection or VPN)
+IGNORE_IP_LOC='kr' # only shown if not this value (= no connection or VPN)
 
 # '' (turn off) or 'print_app_icons.sh' or 'print_app_names.sh'
 PRINT_APP_SH='print_app_names.sh'
 
 # Unless poll_ip_loc.sh is already running, launch one in the background
-cnt=`ps -A | grep 'poll_ip_loc\.sh' | wc -l`
-[ $cnt = 0 ] && $SCRIPT_PATH/poll_ip_loc.sh &
+[ `ps | grep -c 'poll_ip_loc\.sh'` = 0 ] && $SCRIPT_PATH/poll_ip_loc.sh &
 
 # Storage for variables inside loop
 rows_prev=0

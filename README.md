@@ -27,9 +27,7 @@ inconvenient with the Menu Bar & Dock hidden for screen estate/minimalism.
 
 - Clone repository
 - Build auxiliary tools with `build.sh`
-  - requires *Xcode Command Line Tools* (`xcode-select --install`)
-    or full *Xcode*
-- Configure optional lines in `minidock.sh`
+- Configure options in `minidock.sh`
 - Run within [iTerm2](https://www.iterm2.com) after setting
   - Profiles > Colors (Background/Cursor f7f7f7) (optional)
   - Profiles > Text > Font (14pt Menlo Regular, Anti-aliased) (optional)
@@ -37,29 +35,29 @@ inconvenient with the Menu Bar & Dock hidden for screen estate/minimalism.
   - Profiles > Terminal > (off) Disable session-initialized window resizing
   - Keys > Show/hide *iTerm2* with a system-wide hotkey
   - Advanced > Hide *iTerm2* from the dock (optional)
-- If *iTerm2* is not showing up, use the show/hide hotkey (`cmd-space`)
+- If *iTerm2* is not showing up, use the show/hide hotkey (`option-space`)
   after focusing on a different window
 - To launch on *iTerm2* startup, edit `.bash_profile` to include
   (unless run in background with a ` &`, it will have trouble exiting cleanly)
 ```bash
     if [ $TERM_PROGRAM = 'iTerm.app' ]; then
-        relative/path/to/minidock.sh &
+        if [ `ps | grep -c 'minidock\.sh'` = 0 ]; then
+            relative/path/to/minidock.sh &
+        else
+            : # usual init stuff
+        fi
     fi
 ```
 
 
 ## To use `print_app_icons.sh`
-- Icons need to be placed in `icons/` as `$APPNAME.png`;
-  they cannot be uploaded here due to copyright issues
-- If `$APPNAME.png` is not present, the app will be displayed as grey text
-  (first two letters)
-- To figure out the right `$APPNAME` for an app, use `print_app`;
+- Icons need to be stored as `icons/$APPNAME.png`
+- They cannot be uploaded here due to copyright issues, but can be extracted
+  automatically from `/Applications` using `extract_icons.sh`
+- If an `$APPNAME.png` is not present, the app will be displayed as the first
+  two letters of `$APPNAME` in grey text
+- To find the `$APPNAME` for an app, use `print_app` while the app is running;
   name tends to be (but not always) the same as shown on the macOS Menu Bar 
-- Icons can be extracted from `.app` by finding the `.icns` file in
-  `$APP.app/Contents/Resources`;
-  the extracted images are usually `.tiff` files and will need conversion
-- Icons can be any size, but large images will slow *iTerm2* down
-  (used icons resized to `64×64` in the screenshot above)
 
 
 ## Notes
