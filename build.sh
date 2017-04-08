@@ -2,6 +2,5 @@
 
 SCRIPT_PATH=${0%/*}
 
-clang++ -framework CoreAudio -std=c++11 -o $SCRIPT_PATH/audio_device $SCRIPT_PATH/audio_device.cc
-clang -framework AppKit -o $SCRIPT_PATH/print_app $SCRIPT_PATH/print_app.m
-clang -framework AppKit -o $SCRIPT_PATH/screen_size $SCRIPT_PATH/screen_size.m
+make
+clang++ -std=c++14 -Wall -framework AppKit -o $SCRIPT_PATH/bin/print_app $SCRIPT_PATH/readme/print_app.mm

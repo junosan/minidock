@@ -3,9 +3,8 @@
 # For all .apps in /Applications, find icon files and convert to 64 x 64 png
 
 # - Store icons as icons/$APPNAME.png without internal subdirectories,
-#   where $APPNAME can be found by running print_app while the app is running
-#   (while the name found in Info.plist is usually the right one,
-#    it is not always the case)
+#   where $APPNAME can be found by using bin/print_app while the app is running
+#   (the name found in Info.plist is usually the right one, but not always)
 # - Icons can be any size, but large images will slow iTerm2 down
 
 SCRIPT_PATH=${0%/*}
