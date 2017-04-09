@@ -102,6 +102,8 @@ void AppList::init(enum mode mode, const std::string &bin_path)
                                      std::move(rep));
                 }
             }
+
+            closedir(dir);
         }
     }
 

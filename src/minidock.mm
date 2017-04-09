@@ -37,7 +37,9 @@ struct info_t {
     AppList::apps_t apps_prev = AppList::apps_t{{}, -1};
 };
 
-void timer_callback(CFRunLoopTimerRef timer, void *info)
+void timer_callback(CFRunLoopTimerRef timer, void *info) {
+// prevent leak by NSRunningApplication (notably) and other NS API calls
+@autoreleasepool
 {
     auto &inf = *(info_t*)info;
 
@@ -131,7 +133,7 @@ void timer_callback(CFRunLoopTimerRef timer, void *info)
 
         std::cout << out;
     }
-}
+}}
 
 int main(int argc, const char *argv[])
 {
