@@ -16,6 +16,7 @@ struct info_t {
     Geolocation geoloc;
     AppList applist;
 
+    // initialized from config file
     bool input_enable;
     bool audio_enable;
     bool geoloc_enable;
@@ -28,11 +29,8 @@ struct info_t {
     int height_unit;
     int height_edge;
 
-    // for determining visual refresh
-    bool repeat_refresh = false;
+    // initialized to null values
     int n_row_prev = 0;
-    // int pos_x_prev = 0;
-    // int pos_y_prev = 0;
     std::string upper_prev;
     AppList::apps_t apps_prev = AppList::apps_t{{}, -1};
 };
@@ -89,11 +87,8 @@ void timer_callback(CFRunLoopTimerRef timer, void *info) {
             (n_row * inf.height_unit + 2 * inf.height_edge)) / 2
         - std::get<2>(dims));
 
-    // if (pos_y != inf.pos_y_prev || pos_x != inf.pos_x_prev)
     out += "\033[3;" + std::to_string(pos_x) + ";"
                      + std::to_string(pos_y) + "t";
-    // inf.pos_x_prev = pos_x;
-    // inf.pos_y_prev = pos_y;
 
     /* visible content */
     out += "\033[H";         // cursor at top left corner
@@ -116,13 +111,8 @@ void timer_callback(CFRunLoopTimerRef timer, void *info) {
     refresh = refresh || (out != inf.upper_prev);
     inf.upper_prev = out;
 
-    if (refresh == true || inf.repeat_refresh == true)
+    if (refresh == true)
     {
-        // when refreshing, refresh twice 
-        // reason: due to an unknown iTerm2 (?) bug, the last line doesn't 
-        //         update properly when refreshing only once
-        inf.repeat_refresh = refresh;
-
         if (apps.first.size() > 0)
             out += '\n' + inf.applist.get_string(apps);
 
@@ -131,7 +121,7 @@ void timer_callback(CFRunLoopTimerRef timer, void *info) {
         if (std::string::npos != last_nl)
             out.insert(last_nl + 1, "\033[" + std::to_string(n_row) + "H");
 
-        std::cout << out;
+        std::cout << out << std::flush;
     }
 }}
 
@@ -158,8 +148,8 @@ int main(int argc, const char *argv[])
 
     info.input_enable      = config.get_bool("input_enable", true);
     info.audio_enable      = config.get_bool("audio_enable", true);
-    info.geoloc_enable     = config.get_bool("geoloc_enable", true);
-    info.geoloc_ignore     = config.get_str ("geoloc_ignore", "kr");
+    info.geoloc_enable     = config.get_bool("geoloc_enable", false);
+    info.geoloc_ignore     = config.get_str ("geoloc_ignore", "us");
     info.applist_enable    = config.get_bool("applist_enable", true);
     bool applist_use_icons = config.get_bool("applist_use_icons", false);
     info.pos_y_middle      = config.get_bool("pos_y_middle", true);

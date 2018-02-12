@@ -13,7 +13,7 @@ screen estate/minimalism.
 
 - Requires [iTerm2](https://www.iterm2.com) in 'No Title Bar' mode
 - Creates a tiny display placed at the middle right side or the top right
-  corner with
+  corner with (each can be turned on/off)
   - clock - hour & minute
   - input language as a flag
   - audio output device name (first letter) and volume (- mute, 0~9, | full)
@@ -45,6 +45,10 @@ screen estate/minimalism.
         fi
     fi
 ```
+- When using multiple displays, the rightmost display needs to be set as
+  the 'main' display (System Preferences > Displays > Arrangement > drag the
+  menu bar to the rightmost display).
+  *minidock* needs to be launched from the rightmost display. 
 
 
 ## Displaying icons in the app list

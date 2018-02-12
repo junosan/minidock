@@ -41,6 +41,7 @@ void AppList::init(enum mode mode, const std::string &bin_path)
             {"Preview",                  COLOR( 69) "Pv"              },
             {"Reminders",                COLOR(208) "R" COLOR(251) "m"},
             {"Safari",                   COLOR( 75) "S" COLOR(203) "f"},
+            {"Signal",                   COLOR( 75) "S" COLOR(251) "n"},
             {"Skype",                    COLOR( 75) "S" COLOR(251) "k"},
             {"System Preferences",       COLOR(240) "S" COLOR(251) "y"},
             {"TeXShop",                  COLOR(109) "T" COLOR(251) "x"},
