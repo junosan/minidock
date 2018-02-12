@@ -3,6 +3,7 @@
 #include "simple_polls.h"
 #include "Geolocation.h"
 #include "AppList.h"
+#include "apple_api.h"
 
 #include <Foundation/Foundation.h>
 #include <Carbon/Carbon.h>
@@ -59,7 +60,7 @@ void timer_callback(CFRunLoopTimerRef timer, void *info) {
     bool refresh = (apps != inf.apps_prev);
     inf.apps_prev = apps;
 
-    /* window manipulation */
+    /* window size */
     int n_row = 2 // hour, minute
                 + static_cast<int>(inf.input_enable)
                 + static_cast<int>(inf.audio_enable)
@@ -76,19 +77,20 @@ void timer_callback(CFRunLoopTimerRef timer, void *info) {
         out += "\033[" + std::to_string(inf.n_row_prev - n_row) + "T";
     inf.n_row_prev = n_row;
 
-    // (effective width, full height, height offset)
-    auto dims = simple_polls::get_screen_dims();
-
+    /* window position */
+    const auto screen_iterm2 = apple_api::get_screen_iterm2_dims();
+    const auto &screen = std::get<0>(screen_iterm2);
+    const auto &iterm2 = std::get<1>(screen_iterm2);
+    
     // two columns + edges
-    int pos_x = std::get<0>(dims) - 2 * (inf.width_unit + inf.width_edge);
+    int pos_x = screen.x + screen.w - 2 * (inf.width_unit + inf.width_edge);
     // n_row rows + edges (middle) or 0 (top)
-    int pos_y = (inf.pos_y_middle == false ? 0 :
-        (std::get<1>(dims) -
-            (n_row * inf.height_unit + 2 * inf.height_edge)) / 2
-        - std::get<2>(dims));
+    int pos_y = screen.y + (inf.pos_y_middle == false ? 0 :
+        (screen.h - (n_row * inf.height_unit + 2 * inf.height_edge)) / 2);
 
-    out += "\033[3;" + std::to_string(pos_x) + ";"
-                     + std::to_string(pos_y) + "t";
+    if (pos_x != iterm2.bounds.x || pos_y != iterm2.bounds.y) {
+        apply_bounds(iterm2, apple_api::Bounds{pos_x, pos_y, 0, 0});
+    }
 
     /* visible content */
     out += "\033[H";         // cursor at top left corner
@@ -133,6 +135,13 @@ int main(int argc, const char *argv[])
         [pool drain];
         return exit_code;
     };
+
+    if (false == apple_api::enable_accessibility_api())
+    {
+        std::cerr << "Accessibility API unavailable\n";
+        return clean_exit(1);
+    }
+
 
     info_t info;
 

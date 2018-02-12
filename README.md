@@ -45,14 +45,18 @@ screen estate/minimalism.
         fi
     fi
 ```
-- When using multiple displays, the rightmost display needs to be set as
-  the 'main' display (System Preferences > Displays > Arrangement > drag the
-  menu bar to the rightmost display).
-  *minidock* needs to be launched from the rightmost display. 
-
 
 ## Displaying icons in the app list
 - Modify `$HOME/.minidockrc` to include `applist_use_icons 1`
 - Extract icons from `/Applications/*/*.app`s using `extract_icons.sh`
 - Put them in `icons` directory as `icons/$APPNAME.png`, where `$APPNAME`s
   can be found by using `bin/print_app` while the apps are running
+
+## Note on using multiple monitors
+- If using an external monitor in 'Mirror Displays' mode, the external monitor
+  needs to be placed on the right side and be set as the main display
+  (In System Preferences > Displays > Arrangement, put the external monitor
+  on the right side and drag the menu bar to the external monitor before
+  turning mirroring on)
+- If not using the 'Mirror Displays' mode, the external monitor can be placed
+  on any side

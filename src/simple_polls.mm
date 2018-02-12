@@ -153,30 +153,4 @@ std::string get_audio_string()
     return ret;
 }
 
-// (effective width, full height, height offset)
-std::tuple<int, int, int> get_screen_dims()
-{
-    auto cf_string = static_cast<CFStringRef>(CFPreferencesCopyAppValue(
-        CFSTR("orientation"), CFSTR("com.apple.dock")));
-
-    std::string dock_orientation([(__bridge NSString*)cf_string UTF8String]);
-    CFRelease(cf_string);
-
-    auto cf_bool = static_cast<CFBooleanRef>(CFPreferencesCopyAppValue(
-        CFSTR("_HIHideMenuBar"), CFSTR("NSGlobalDomain")));
-
-    bool menubar_hidden = (cf_bool == kCFBooleanTrue);
-    CFRelease(cf_bool);
-
-    NSRect full = [[NSScreen mainScreen] frame];        // full dims
-    NSRect comp = [[NSScreen mainScreen] visibleFrame]; // compensated dims
-
-    return std::make_tuple(
-        dock_orientation != "left" ? full.size.width
-                                   : comp.size.width,
-        full.size.height,
-        menubar_hidden == false ? full.size.height - comp.size.height
-                                : 0);
-}
-
 }
