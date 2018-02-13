@@ -3,10 +3,11 @@
 
 #include <string>
 #include <tuple>
+#include <vector>
 
 namespace apple_api
 {
-    // method for moving window adapted from http://github.com/junosan/tile
+    // method for moving window adapted from https://github.com/junosan/tile
     // 
     // NOTE: Although it is possible to achive this in a much simpler way if in
     //       a single display environment (fetch the screen dimensions using 
@@ -28,7 +29,8 @@ namespace apple_api
     };
 
     extern bool enable_accessibility_api();
-    extern std::tuple<Bounds, Window> get_screen_iterm2_dims();
+    extern std::tuple<Bounds, Window, std::vector<std::string>>
+        get_screen_iterm2_apps(bool get_apps);
     extern bool apply_bounds(const Window &window, Bounds bounds);
 }
 

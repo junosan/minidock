@@ -14,10 +14,12 @@ bool enable_accessibility_api()
     return AXIsProcessTrustedWithOptions((CFDictionaryRef)options);
 }
 
-std::tuple<Bounds, Window> get_screen_iterm2_dims()
+std::tuple<Bounds, Window, std::vector<std::string>> 
+    get_screen_iterm2_apps(bool get_apps)
 {
     Bounds screen{std::numeric_limits<int>::lowest(), 0, 0, 0};
     Window iterm2{{0, 0, 0, 0}, 0, {}};
+    std::vector<std::string> apps;
 
     NSArray *window_arr = (NSArray *)CGWindowListCopyWindowInfo(
         kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
@@ -30,7 +32,7 @@ std::tuple<Bounds, Window> get_screen_iterm2_dims()
         str = [window[(id)kCGWindowName] UTF8String];
         std::string title(str != nullptr ? str : "");
 
-        if (owner == "Dock") continue;
+        if (owner == "Dock" || owner == "Spotlight") continue;
         if (owner == "Finder" && title.empty() == true) continue;
         
         bool is_display = (owner == "Window Server" && title == "Desktop");
@@ -44,8 +46,19 @@ std::tuple<Bounds, Window> get_screen_iterm2_dims()
             AXError err = AXUIElementCopyAttributeValue(
                 app, kAXFocusedWindowAttribute, (CFTypeRef *)&frontMostWindow);
             CFRelease(app);
-            if (err != kAXErrorSuccess)
+            
+            if (err != kAXErrorSuccess) {
                 continue;
+            } else {
+                CFRelease(frontMostWindow);
+            }
+            
+            if (get_apps == true &&
+                std::end(apps) == 
+                    std::find(std::begin(apps), std::end(apps), owner) &&
+                owner != "iTerm2") {
+                apps.push_back(owner);
+            }
         }
 
         CGRect rect;
@@ -69,7 +82,7 @@ std::tuple<Bounds, Window> get_screen_iterm2_dims()
     if (window_arr.count > 0)
         CFRelease(window_arr);
 
-    return std::make_pair(screen, iterm2);
+    return std::make_tuple(screen, iterm2, apps);
 }
 
 bool apply_bounds(const Window &window, Bounds bounds)

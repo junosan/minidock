@@ -33,12 +33,11 @@ struct info_t {
     // initialized to null values
     int n_row_prev = 0;
     std::string upper_prev;
-    AppList::apps_t apps_prev = AppList::apps_t{{}, -1};
+    std::vector<std::string> apps_prev;
 };
 
 void timer_callback(CFRunLoopTimerRef timer, void *info) {
-// prevent leak by NSRunningApplication (notably) and other NS API calls
-@autoreleasepool
+@autoreleasepool // prevent leak by NS API calls
 {
     auto &inf = *(info_t*)info;
 
@@ -55,8 +54,12 @@ void timer_callback(CFRunLoopTimerRef timer, void *info) {
     } 
 
     /* app list */
-    auto apps = (inf.applist_enable == true ? inf.applist.get_apps()
-                                            : inf.apps_prev);
+    const auto screen_iterm2_apps = 
+        apple_api::get_screen_iterm2_apps(inf.applist_enable);
+    const auto &screen = std::get<0>(screen_iterm2_apps);
+    const auto &iterm2 = std::get<1>(screen_iterm2_apps);
+    const auto &apps   = std::get<2>(screen_iterm2_apps);
+    
     bool refresh = (apps != inf.apps_prev);
     inf.apps_prev = apps;
 
@@ -66,7 +69,7 @@ void timer_callback(CFRunLoopTimerRef timer, void *info) {
                 + static_cast<int>(inf.audio_enable)
                 + static_cast<int>(show_geoloc)
                 + static_cast<int>(inf.applist_enable) // "──  "
-                + apps.first.size();
+                + apps.size();
     
     // prevent content shifting by pre-/post-scrolling
     if (n_row > inf.n_row_prev)
@@ -77,11 +80,7 @@ void timer_callback(CFRunLoopTimerRef timer, void *info) {
         out += "\033[" + std::to_string(inf.n_row_prev - n_row) + "T";
     inf.n_row_prev = n_row;
 
-    /* window position */
-    const auto screen_iterm2 = apple_api::get_screen_iterm2_dims();
-    const auto &screen = std::get<0>(screen_iterm2);
-    const auto &iterm2 = std::get<1>(screen_iterm2);
-    
+    /* window position */   
     // two columns + edges
     int pos_x = screen.x + screen.w - 2 * (inf.width_unit + inf.width_edge);
     // n_row rows + edges (middle) or 0 (top)
@@ -115,7 +114,7 @@ void timer_callback(CFRunLoopTimerRef timer, void *info) {
 
     if (refresh == true)
     {
-        if (apps.first.size() > 0)
+        if (apps.size() > 0)
             out += '\n' + inf.applist.get_string(apps);
 
         // force cursor to left even when command prompt is present

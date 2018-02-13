@@ -2,8 +2,6 @@
 
 #include "base64.h"
 
-#include <AppKit/AppKit.h>
-
 #include <algorithm>
 #include <fstream>
 #include <vector>
@@ -24,6 +22,7 @@ void AppList::init(enum mode mode, const std::string &bin_path)
             {"Code",                     COLOR( 27) "C" COLOR(251) "d"},
             {"Contacts",                 COLOR(130) "Cn"              },
             {"Dictionary",               COLOR(124) "Dc"              },
+            {"Finder",                   COLOR( 75) "F" COLOR(251) "i"},
             {"Firefox",                  COLOR(202) "F" COLOR( 33) "f"},
             {"Illustrator",              COLOR( 94) "I" COLOR(214) "l"},
             {"MATLAB",                   COLOR( 24) "M" COLOR(160) "t"},
@@ -51,8 +50,8 @@ void AppList::init(enum mode mode, const std::string &bin_path)
             {"TextWrangler",             COLOR(214) "T" COLOR( 75) "W"},
             {"Transmission",             COLOR(160) "T" COLOR(245) "r"},
             {"VLC",                      COLOR(208) "V" COLOR(251) "L"},
-            {"VirtualBox",               COLOR( 18) "V" COLOR( 33) "t"},
-            {"VirtualBox VM",            COLOR( 18) "V" COLOR( 33) "t"},
+            {"VirtualBox",               COLOR( 18) "V" COLOR( 33) "B"},
+            {"VirtualBox VM",            COLOR( 18) "V" COLOR( 33) "M"},
             {"iTerm2",                   COLOR( 16) "i" COLOR( 28) "T"},
             {"iTunes",                   COLOR(205) "i" COLOR(135) "T"}
         };
@@ -112,49 +111,22 @@ void AppList::init(enum mode mode, const std::string &bin_path)
     // assuming sorted map hereafter; do not alter map below
 }
 
-AppList::apps_t AppList::get_apps()
-{
-    apps_t apps{{}, -1};
-
-    for (NSRunningApplication *app in
-        [[NSWorkspace sharedWorkspace] runningApplications])
-    {
-        if ([app activationPolicy] == NSApplicationActivationPolicyRegular)
-        {
-            const char *name = [[app localizedName] UTF8String];
-            
-            if (name != std::string("Finder"))
-            {
-                if ([app ownsMenuBar])
-                    apps.second = apps.first.size();
-
-                apps.first.emplace_back(name);
-            }
-        }
-    }
-
-    return apps; // RVO
-}
-
-std::string AppList::get_string(const apps_t &apps)
+std::string AppList::get_string(const std::vector<std::string> &apps)
 {
     std::string ret;
     
-    for (auto i = 0ul, e = apps.first.size(); i < e; ++i)
+    for (auto i = 0ul, e = apps.size(); i < e; ++i)
     {
-        const auto val = std::make_pair(apps.first[i], std::string{});
+        const auto val = std::make_pair(apps[i], std::string{});
 
         const auto it =
                   std::lower_bound(std::begin(map), std::end(map), val, comp);
         if (it != std::upper_bound(std::begin(map), std::end(map), val, comp))
             ret += it->second;
         else
-            ret += "\033[38;5;251m" + apps.first[i].substr(0, 2);
+            ret += "\033[38;5;251m" + apps[i].substr(0, 2);
 
-        if (i == apps.second)
-            ret += "\033[0m• ";
-        else
-            ret += "  ";
+        ret += "  ";
         
         if (i < e - 1) // cannot enter loop with e == 0
             ret += '\n';

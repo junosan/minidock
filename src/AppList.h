@@ -10,12 +10,7 @@ class AppList
 public:
     enum class mode { text, icon };
     void init(mode mode, const std::string &bin_path);
-
-    // (vec<app name>, focused app's index)
-    using apps_t = std::pair<std::vector<std::string>, std::ptrdiff_t>;
-
-    apps_t get_apps();
-    std::string get_string(const apps_t &apps);
+    std::string get_string(const std::vector<std::string> &apps);
 
 private:
     // (app name, representation)

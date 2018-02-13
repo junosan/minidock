@@ -18,7 +18,7 @@ screen estate/minimalism.
   - input language as a flag
   - audio output device name (first letter) and volume (- mute, 0~9, | full)
   - internet connection (nc - no connection, country - if on VPN)
-  - currently open apps (dot on focused app)
+  - currently open apps (decreasing order in recency of focus)
 
 
 # How to use
@@ -52,7 +52,7 @@ screen estate/minimalism.
 - Put them in `icons` directory as `icons/$APPNAME.png`, where `$APPNAME`s
   can be found by using `bin/print_app` while the apps are running
 
-## Note on using multiple monitors
+## Notes on using multiple monitors
 - If using an external monitor in 'Mirror Displays' mode, the external monitor
   needs to be placed on the right side and be set as the main display
   (In System Preferences > Displays > Arrangement, put the external monitor
