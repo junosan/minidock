@@ -35,9 +35,10 @@ std::tuple<Bounds, Window, std::vector<std::string>>
         if (owner == "Dock" || owner == "Spotlight") continue;
         if (owner == "Finder" && title.empty() == true) continue;
         
-        bool is_display = (owner == "Window Server" && title == "Desktop");
+        // Note: macOS 10.15 disabled kCGWindowName (returns blank)
+        bool is_display = (owner == "Window Server"); //&& title == "Desktop");
         int pid = [window[(id)kCGWindowOwnerPID] intValue];
-        
+
         if (is_display == false)
         {
             // skip Menu Bar and icons on it (they don't support AXUIElement)
@@ -65,15 +66,22 @@ std::tuple<Bounds, Window, std::vector<std::string>>
         CGRectMakeWithDictionaryRepresentation(
             (CFDictionaryRef)window[(id)kCGWindowBounds], &rect);
 
-        if (owner == "iTerm2" && title == "minidock")
+        // Note: as a side effect of not being able to check the title,
+        //       identifying the docked window as the rightmost one
+        //       (this breaks with multiple screens)
+        // && title == "minidock")
+        if (owner == "iTerm2" && (int)rect.origin.x > iterm2.bounds.x)
         {
             iterm2 = Window{{(int)rect.origin.x, (int)rect.origin.y,
                              (int)rect.size.width, (int)rect.size.height},
                              pid, title};
         }
-        if (is_display == true &&
+
+        // Note: as a side effect of not being able to check the title,
+        //       need to filter non-screen elements using height
+        if (is_display == true && rect.size.height > 100 && 
             rect.origin.x + rect.size.width > screen.x + screen.w)
-        {
+        {            
             screen = Bounds({(int)rect.origin.x, (int)rect.origin.y,
                              (int)rect.size.width, (int)rect.size.height});
         }
@@ -127,8 +135,9 @@ bool apply_bounds(const Window &window, Bounds bounds)
         std::string title(title_c_str != NULL ? title_c_str : "");
         CFRelease(v);
 
-        if (title != window.title)
-            continue;
+        // Note: macOS 10.15 no longer allows querying window titles
+        // if (title != window.title)
+        //     continue;
 
         if (window.bounds.x != bounds.x || window.bounds.y != bounds.y)
         {
