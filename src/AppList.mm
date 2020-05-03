@@ -53,7 +53,8 @@ void AppList::init(enum mode mode, const std::string &bin_path)
             {"VirtualBox",               COLOR( 18) "V" COLOR( 33) "B"},
             {"VirtualBox VM",            COLOR( 18) "V" COLOR( 33) "M"},
             {"iTerm2",                   COLOR( 16) "i" COLOR( 28) "T"},
-            {"iTunes",                   COLOR(205) "i" COLOR(135) "T"}
+            {"iTunes",                   COLOR(205) "i" COLOR(135) "T"},
+            {"Music",                    COLOR(205) "M" COLOR(135) "u"}
         };
         #undef COLOR
     }

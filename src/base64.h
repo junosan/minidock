@@ -10,7 +10,7 @@ template <class Container>
 std::string encode(Container &in)
 {
     // Assumes STL random access dynamic container (string, vector, etc.)
-    // For efficiency, temporarily alters "in" but restores it afterwords
+    // For efficiency, temporarily alters "in" but restores it afterwards
     
     // See https://en.wikipedia.org/wiki/Base64
     constexpr static char b64[] = 

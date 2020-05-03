@@ -34,4 +34,4 @@ namespace apple_api
     extern bool apply_bounds(const Window &window, Bounds bounds);
 }
 
-#endif /* SIMPLE_POLLS_H_ */
+#endif /* APPLE_API_H_ */

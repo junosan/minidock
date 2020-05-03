@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <thread>
 
 struct info_t {
@@ -22,6 +23,7 @@ struct info_t {
     bool audio_enable;
     bool geoloc_enable;
     std::string geoloc_ignore;
+    std::string status_file;
     bool applist_enable;
     bool pos_y_middle;
 
@@ -53,6 +55,20 @@ void timer_callback(CFRunLoopTimerRef timer, void *info) {
             show_geoloc = true;
     } 
 
+    /* status file */
+    std::string status;
+    std::ifstream file(inf.status_file);
+    if (file.is_open())
+    {
+        // Using >> may unnecessarily strip leading whitespace
+        constexpr std::streamsize length = 2;
+        char buf[1 + length];
+        file.get(buf, 1 + length);
+        status = buf;
+        if (status.length() == 1)
+            status += " "; // mask previously printed stuff
+    }
+
     /* app list */
     const auto screen_iterm2_apps = 
         apple_api::get_screen_iterm2_apps(inf.applist_enable);
@@ -68,6 +84,7 @@ void timer_callback(CFRunLoopTimerRef timer, void *info) {
                 + static_cast<int>(inf.input_enable)
                 + static_cast<int>(inf.audio_enable)
                 + static_cast<int>(show_geoloc)
+                + static_cast<int>(status.length() > 0)
                 + static_cast<int>(inf.applist_enable) // "──  "
                 + apps.size();
     
@@ -105,6 +122,9 @@ void timer_callback(CFRunLoopTimerRef timer, void *info) {
     
     if (show_geoloc == true)
         out += "\n" + inf.geoloc.get_string();
+
+    if (status.length() > 0)
+        out += "\n" + status;
 
     if (inf.applist_enable == true)
         out += "\n──  ";
@@ -158,6 +178,7 @@ int main(int argc, const char *argv[])
     info.audio_enable      = config.get_bool("audio_enable", true);
     info.geoloc_enable     = config.get_bool("geoloc_enable", false);
     info.geoloc_ignore     = config.get_str ("geoloc_ignore", "us");
+    info.status_file       = config.get_str ("status_file", "");
     info.applist_enable    = config.get_bool("applist_enable", true);
     bool applist_use_icons = config.get_bool("applist_use_icons", false);
     info.pos_y_middle      = config.get_bool("pos_y_middle", true);
